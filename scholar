@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scholarship Super Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #020817;
+      --bg-card: #020617;
+      --accent: #38bdf8;
+      --accent-2: #a855f7;
+      --accent-soft: rgba(56, 189, 248, 0.08);
+      --danger: #f97373;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.3);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0f172a, #020617 55%, #000000);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 22px 12px 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1150px;
+    }
+
+    header {
+      margin-bottom: 18px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 3vw, 2.4rem);
+      letter-spacing: -0.03em;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .h1-highlight {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 620px;
+    }
+
+    .controls {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+    }
+
+    @media (max-width: 800px) {
+      body { padding: 18px 10px 30px; }
+      .controls { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 36px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text);
+      outline: none;
+      font-size: 0.9rem;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.85);
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    select,
+    .toggle-btn {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    select {
+      appearance: none;
+      padding-right: 28px;
+      background-image: linear-gradient(45deg, transparent 50%, #64748b 50%),
+        linear-gradient(135deg, #64748b 50%, transparent 50%);
+      background-position: calc(100% - 14px) 52%, calc(100% - 9px) 52%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: rgba(56, 189, 248, 0.9);
+    }
+
+    .toggle-btn {
+      border-style: dashed;
+      transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.06s;
+    }
+
+    .toggle-btn.active {
+      background: var(--accent-soft);
+      border-color: rgba(56, 189, 248, 0.9);
+      color: var(--accent);
+    }
+
+    .toggle-btn:active {
+      transform: scale(0.96);
+    }
+
+    main { margin-top: 18px; }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      font-size: 0.75rem;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.06s;
+    }
+
+    .pill.active {
+      border-color: rgba(56, 189, 248, 0.9);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .pill:active {
+      transform: scale(0.96);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .summary-row strong { color: var(--accent); }
+
+    .scholarship-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at 0% 0%, #111827, #020617 55%);
+      box-shadow: var(--shadow);
+      padding: 14px 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -45%;
+      background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.16), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+      pointer-events: none;
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .card-subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .meta-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chip-accent {
+      border-color: rgba(56, 189, 248, 0.9);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .chip-danger {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+    }
+
+    .chip-warning {
+      border-color: #fbbf24;
+      background: rgba(245, 158, 11, 0.1);
+      color: #facc15;
+    }
+
+    .chip-rolling {
+      border-color: rgba(129, 140, 248, 0.9);
+      background: rgba(79, 70, 229, 0.08);
+      color: #c7d2fe;
+    }
+
+    .chip-okay {
+      border-color: rgba(52, 211, 153, 0.9);
+      background: rgba(16, 185, 129, 0.08);
+      color: #6ee7b7;
+    }
+
+    .save-btn {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: 4px 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.06s;
+      white-space: nowrap;
+    }
+
+    .save-btn .star { font-size: 0.9em; }
+
+    .save-btn.saved {
+      background: rgba(250, 204, 21, 0.12);
+      border-color: rgba(234, 179, 8, 0.9);
+      color: #facc15;
+    }
+
+    .save-btn:active {
+      transform: scale(0.95);
+    }
+
+    .description {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    .requirements-list {
+      font-size: 0.73rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .requirements-list strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .requirements-list ul {
+      margin-top: 2px;
+      padding-left: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px 14px;
+    }
+
+    .requirements-list li { list-style: disc; }
+
+    .card-footer {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .deadline-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 0.73rem;
+    }
+
+    .deadline-value { font-weight: 500; }
+
+    .days-left {
+      font-size: 0.72rem;
+    }
+
+    .days-left.urgent { color: #fb923c; }
+    .days-left.today { color: #4ade80; }
+    .days-left.closed { color: var(--danger); }
+    .days-left.notyet { color: #eab308; }
+
+    .apply-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 15px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #020617;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 15px 35px rgba(56, 189, 248, 0.45);
+      transition: transform 0.08s, box-shadow 0.08s;
+    }
+
+    .apply-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 40px rgba(56, 189, 248, 0.55);
+    }
+
+    .apply-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 12px 24px rgba(56, 189, 248, 0.35);
+    }
+
+    .empty {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .helper {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="badge-row">
+        <div class="badge">
+          <span class="dot"></span>
+          <span>Scholarship Control Center</span>
+        </div>
+        <div class="badge">
+          <span>Built for</span>
+          <span style="color:#e5e7eb;font-weight:500;">you + future users</span>
+        </div>
+      </div>
+      <h1>
+        <span class="h1-highlight">Find & Track</span>
+        <span>College Money in One Place</span>
+      </h1>
+      <p class="subtitle">
+        Search, filter, and save scholarships: federal aid, Chapter&nbsp;35, UC/CSU,
+        state grants, school-specific, STEM, military, need-based, merit, and more.
+        Click “Go to application” or follow the steps in the description.
+      </p>
+
+      <div class="controls">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input id="searchInput" class="search-input" type="search"
+                 placeholder="Search by name, school, major, requirement, or keyword…" />
+        </div>
+        <div class="meta-row">
+          <select id="typeSelect">
+            <option value="all">Type: All</option>
+            <option value="federal">Type: Federal / FAFSA</option>
+            <option value="state">Type: State programs</option>
+            <option value="school">Type: UC / CSU / School-specific</option>
+            <option value="military">Type: Military / VA / ROTC</option>
+            <option value="stem">Type: STEM</option>
+            <option value="demographic">Type: Ethnicity / identity</option>
+            <option value="major">Type: Major-based</option>
+            <option value="private">Type: Private / foundation</option>
+          </select>
+
+          <select id="sortSelect">
+            <option value="deadline">Sort: Soonest deadline</option>
+            <option value="amountHigh">Sort: Highest amount</option>
+            <option value="amountLow">Sort: Lowest amount</option>
+            <option value="name">Sort: A–Z name</option>
+          </select>
+
+          <button id="openOnlyBtn" class="toggle-btn" type="button">
+            ⏳ Open / rolling only
+          </button>
+
+          <button id="savedOnlyBtn" class="toggle-btn" type="button">
+            ⭐ Saved only
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="pill-row" id="categoryPills">
+        <button class="pill active" data-category="all">✨ All categories</button>
+        <button class="pill" data-category="need">💸 Need-based</button>
+        <button class="pill" data-category="merit">📚 Merit-based</button>
+        <button class="pill" data-category="uc">🟦 UC / CSU / CA</button>
+        <button class="pill" data-category="community">🏫 Community college</button>
+        <button class="pill" data-category="firstgen">🎓 First-gen</button>
+        <button class="pill" data-category="military">🎖️ Military / VA / ROTC</button>
+        <button class="pill" data-category="stem">🧪 STEM</button>
+      </div>
+
+      <div class="summary-row">
+        <div>
+          <span id="resultCount"></span>
+          <div class="helper">
+            Tip: later you can paste more scholarships into the array in the script section.
+          </div>
+        </div>
+      </div>
+
+      <section class="scholarship-grid" id="scholarshipList"></section>
+      <div id="emptyState" class="empty" style="display:none;">
+        <strong>No scholarships match your filters.</strong>  
+        Try clearing a category, turning off “Saved only,” or searching a different term.
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===== DATA: starter set (you can expand this list anytime) =====
+    // amount: number (max award in USD) or null if varies
+    // deadline/openFrom: "YYYY-MM-DD" or "" for rolling / unknown
+    const scholarships = [
+      {
+        id: "federal-pell",
+        name: "Federal Pell Grant",
+        provider: "U.S. Department of Education",
+        amount: 7395,
+        deadline: "2026-06-30",
+        openFrom: "",
+        types: ["federal", "need"],
+        categories: ["need"],
+        tags: ["FAFSA", "federal", "grant", "undergraduate"],
+        eligibility: "Undergraduate students with financial need. Based on your Student Aid Index (SAI), cost of attendance, and enrollment status.",
+        requirements: [
+          "Submit the FAFSA each year",
+          "Pursuing first bachelor’s degree (with limited exceptions)",
+          "Meet federal aid eligibility rules"
+        ],
+        link: "https://studentaid.gov/understand-aid/types/grants/pell"
+      },
+      {
+        id: "chapter-35",
+        name: "VA Survivors’ & Dependents’ Educational Assistance (DEA, Chapter 35)",
+        provider: "U.S. Department of Veterans Affairs",
+        amount: null,
+        deadline: "",
+        openFrom: "",
+        types: ["federal", "military", "need"],
+        categories: ["military"],
+        tags: ["VA", "dependents", "military", "monthly stipend"],
+        eligibility: "Children and spouses of veterans who died, are MIA, or are permanently disabled due to service. Benefits may last up to 36–45 months depending on when training started.",
+        requirements: [
+          "File VA Form 22-5490 online or by mail",
+          "Choose an approved degree, certificate, or apprenticeship program",
+          "Verify enrollment monthly to receive payments"
+        ],
+        link: "https://www.va.gov/family-and-caregiver-benefits/education-and-careers/dependents-education-assistance/"
+      },
+      {
+        id: "mcs",
+        name: "Middle Class Scholarship (MCS)",
+        provider: "California Student Aid Commission",
+        amount: null,
+        deadline: "2025-04-02",
+        openFrom: "",
+        types: ["state", "need"],
+        categories: ["need", "uc"],
+        tags: ["UC", "CSU", "California", "FAFSA", "CADAA"],
+        eligibility: "California residents attending UC or CSU (and some community college bachelor’s programs) who meet income and asset ceilings and apply for financial aid on time.",
+        requirements: [
+          "Submit FAFSA or California Dream Act Application (CADAA) by state deadline",
+          "Attend a UC, CSU, or eligible bachelor’s program",
+          "Meet income / asset ceilings and academic progress rules"
+        ],
+        link: "https://www.csac.ca.gov/middle-class-scholarship"
+      },
+      {
+        id: "cal-grant",
+        name: "Cal Grant A / B / C",
+        provider: "California Student Aid Commission",
+        amount: null,
+        deadline: "2025-04-02",
+        openFrom: "",
+        types: ["state", "need"],
+        categories: ["need", "uc", "community"],
+        tags: ["California", "UC", "CSU", "community college", "grant"],
+        eligibility: "California residents who meet GPA, income, and asset limits and file FAFSA or CADAA. Awards differ for university, community college, and career programs.",
+        requirements: [
+          "Submit FAFSA or CADAA by state deadline",
+          "Have high school or college GPA verified by your school",
+          "Meet California residency and program enrollment rules"
+        ],
+        link: "https://www.csac.ca.gov/"
+      },
+      {
+        id: "hope-scholarship-ga",
+        name: "HOPE Scholarship (Georgia)",
+        provider: "Georgia Student Finance Commission",
+        amount: null,
+        deadline: "",
+        openFrom: "",
+        types: ["state", "merit"],
+        categories: ["merit"],
+        tags: ["Georgia", "GPA", "tuition assistance"],
+        eligibility: "Georgia residents who graduate from a HOPE-eligible high school with at least a 3.0 GPA and maintain a 3.0 in college.",
+        requirements: [
+          "Graduate from a HOPE-eligible high school with ≥3.0 HOPE GPA",
+          "Maintain ≥3.0 cumulative GPA in college",
+          "Meet residency and credit-hour limits"
+        ],
+        link: "https://gsfc.georgia.gov/hope"
+      },
+      {
+        id: "hope-grant",
+        name: "HOPE Grant (Georgia)",
+        provider: "Georgia Student Finance Commission",
+        amount: null,
+        deadline: "",
+        openFrom: "",
+        types: ["state", "merit"],
+        categories: ["merit", "community"],
+        tags: ["Georgia", "technical college", "certificate", "diploma"],
+        eligibility: "Georgia residents in certificate or diploma programs (often at technical colleges) who maintain a minimum 2.0 GPA.",
+        requirements: [
+          "Enroll in an eligible technical college or program",
+          "Maintain ≥2.0 GPA",
+          "Stay within credit-hour caps"
+        ],
+        link: "https://gsfc.georgia.gov/hope"
+      },
+      {
+        id: "zell-miller",
+        name: "Zell Miller Scholarship (Georgia)",
+        provider: "Georgia Student Finance Commission",
+        amount: null,
+        deadline: "",
+        openFrom: "",
+        types: ["state", "merit"],
+        categories: ["merit"],
+        tags: ["Georgia", "high GPA", "SAT", "ACT"],
+        eligibility: "Georgia residents graduating high school with ≥3.70 HOPE GPA and minimum SAT 1200 or ACT 26; must maintain ≥3.30 in college.",
+        requirements: [
+          "Graduate from HOPE-approved high school with ≥3.70 HOPE GPA",
+          "Meet SAT/ACT minimum scores",
+          "Maintain ≥3.30 GPA and meet time / credit limits"
+        ],
+        link: "https://gsfc.georgia.gov/hope"
+      },
+      {
+        id: "texas-grant",
+        name: "TEXAS Grant (Toward Excellence, Access, and Success)",
+        provider: "State of Texas",
+        amount: null,
+        deadline: "",
+        openFrom: "",
+        types: ["state", "need"],
+        categories: ["need"],
+        tags: ["Texas", "grant", "SAI", "first bachelor’s"],
+        eligibility: "Texas residents pursuing their first bachelor’s degree who demonstrate financial need (Student Aid Index below a cutoff) and enroll soon after high school, associate degree, or military discharge.",
+        requirements: [
+          "Submit FAFSA or state aid application early",
+          "Be a Texas resident and meet SAI requirement",
+          "Enroll at least 9 credit hours at an eligible institution"
+        ],
+        link: "https://financialaid.unt.edu/texas-grant.html"
+      },
+      {
+        id: "tap-ny",
+        name: "New York Tuition Assistance Program (TAP)",
+        provider: "New York State Higher Education Services Corporation",
+        amount: 5665,
+        deadline: "2026-06-30",
+        openFrom: "",
+        types: ["state", "need"],
+        categories: ["need"],
+        tags: ["New York", "grant", "tuition"],
+        eligibility: "New York residents attending approved NY colleges who meet income limits and file FAFSA and TAP (or NY Dream Act) applications.",
+        requirements: [
+          "Complete FAFSA",
+          "Complete TAP or NY Dream Act application",
+          "Meet residency, income, and academic progress standards"
+        ],
+        link: "https://www.hesc.ny.gov/"
+      },
+      {
+        id: "uc-blue-gold",
+        name: "UC Blue & Gold Opportunity Plan",
+        provider: "University of California",
+        amount: null,
+        deadline: "2025-03-02",
+        openFrom: "",
+        types: ["school", "need"],
+        categories: ["uc", "need"],
+        tags: ["UC", "California", "low-income", "tuition"],
+        eligibility: "California residents whose total family income is below a UC-set threshold (e.g., around $80,000) and who qualify for need-based aid. Covers systemwide tuition and fees with grants and scholarships.",
+        requirements: [
+          "Be a California resident or AB 540–eligible",
+          "Submit FAFSA or California Dream Act Application on time",
+          "Enroll at a UC campus and demonstrate financial need"
+        ],
+        link: "https://admission.universityofcalifornia.edu/tuition-financial-aid/types-of-aid/grants-and-scholarships/blue-and-gold-opportunity-plan.html"
+      },
+      {
+        id: "uc-regents-example",
+        name: "UC Campus Regents Scholarship (example listing)",
+        provider: "University of California (campus-specific)",
+        amount: null,
+        deadline: "2025-11-01",
+        openFrom: "",
+        types: ["school", "merit"],
+        categories: ["uc", "merit"],
+        tags: ["Regents", "UC", "merit", "campus-specific"],
+        eligibility: "Top applicants to each UC campus are invited to apply or are automatically considered. Renewable merit scholarship with additional perks (priority registration, housing preference, etc.).",
+        requirements: [
+          "Apply for admission to the UC campus by the deadline",
+          "Maintain required GPA for renewal",
+          "Follow campus-specific instructions on the financial aid site"
+        ],
+        link: "https://admission.universityofcalifornia.edu/tuition-financial-aid/types-of-aid/scholarships.html"
+      },
+      {
+        id: "cc-foundation-example",
+        name: "Community College Foundation Transfer Scholarship (example)",
+        provider: "Local Community College Foundation",
+        amount: 2000,
+        deadline: "2025-05-01",
+        openFrom: "2025-02-01",
+        types: ["school", "need", "merit"],
+        categories: ["community", "firstgen"],
+        tags: ["community college", "transfer", "first-gen"],
+        eligibility: "Second-year community college students planning to transfer to a 4-year university. Preference for first-generation and low-income students.",
+        requirements: [
+          "Minimum 3.0 GPA and at least 45 transferable units",
+          "Submit short personal statement and unofficial transcript",
+          "Provide proof of university application or acceptance"
+        ],
+        link: "https://examplecollege.edu/foundation-scholarships" // replace with your CC link
+      },
+      {
+        id: "sbb-stem",
+        name: "SBB Research Group STEM Scholarship",
+        provider: "SBB Research Group Foundation",
+        amount: 2500,
+        deadline: "2025-11-30",
+        openFrom: "",
+        types: ["private", "stem", "merit"],
+        categories: ["stem", "merit"],
+        tags: ["STEM", "essay", "undergrad", "grad"],
+        eligibility: "Students pursuing higher education in STEM fields who are committed to using STEM to create positive impact.",
+        requirements: [
+          "Write a ≤500 word essay about your most significant STEM experiences and impact",
+          "Submit application through the SBB Research Group portal",
+          "Respond promptly if selected"
+        ],
+        link: "https://www.scholarships.com/scholarships/sbb-research-group-stem-scholarship"
+      },
+      {
+        id: "smart-dod",
+        name: "SMART Scholarship-for-Service (DoD)",
+        provider: "U.S. Department of Defense",
+        amount: null,
+        deadline: "2025-12-05",
+        openFrom: "",
+        types: ["federal", "stem", "service"],
+        categories: ["stem", "merit", "military"],
+        tags: ["DoD", "service commitment", "STEM majors", "full tuition"],
+        eligibility: "U.S. citizens pursuing eligible STEM degrees who will work for the Department of Defense as civilians after graduation.",
+        requirements: [
+          "Be at least 18 and a U.S. citizen",
+          "Be enrolled or accepted in an accredited STEM program",
+          "Agree to post-graduation service commitment with DoD"
+        ],
+        link: "https://www.smartscholarship.org/"
+      },
+      {
+        id: "fossi",
+        name: "Future of STEM Scholars Initiative (FOSSI)",
+        provider: "American Institute of Chemical Engineers (AIChE)",
+        amount: 40000,
+        deadline: "2025-12-31",
+        openFrom: "",
+        types: ["private", "stem", "demographic"],
+        categories: ["stem", "demographic"],
+        tags: ["HBCU", "STEM", "underrepresented students"],
+        eligibility: "High school seniors from underrepresented communities who will major in preferred STEM fields at participating HBCUs.",
+        requirements: [
+          "Apply as a high school senior",
+          "Plan to attend a participating HBCU in a STEM major",
+          "Submit transcripts, recommendations, and essays as requested"
+        ],
+        link: "https://www.futureofstemscholars.org/"
+      },
+      {
+        id: "major-business-stem-example",
+        name: "Scarlett Family Foundation Scholarship (Business & STEM)",
+        provider: "Scarlett Family Foundation",
+        amount: 30000,
+        deadline: "2025-12-15",
+        openFrom: "2025-10-01",
+        types: ["private", "major"],
+        categories: ["stem", "merit"],
+        tags: ["Tennessee", "business", "STEM", "4-year college"],
+        eligibility: "Tennessee students pursuing business or STEM degrees at eligible 4-year, non-profit colleges.",
+        requirements: [
+          "Be a Tennessee resident",
+          "Pursue eligible business or STEM major",
+          "Submit application with transcript and essays"
+        ],
+        link: "https://www.scarlettfoundation.org/scholarships" // check for current URL
+      }
+    ];
+
+    // ===== STATE =====
+    const state = {
+      search: "",
+      typeFilter: "all",
+      categoryFilter: "all",
+      sortBy: "deadline",
+      openOnly: false,
+      savedIds: new Set()
+    };
+
+    const STORAGE_KEY = "scholarship_saved_ids_v2";
+
+    function loadSaved() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) state.savedIds = new Set(arr);
+      } catch (_) {}
+    }
+
+    function saveSaved() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([...state.savedIds]));
+      } catch (_) {}
+    }
+
+    // ===== DATE / AMOUNT HELPERS =====
+    function parseDate(d) {
+      if (!d) return null;
+      return new Date(d + "T00:00:00");
+    }
+
+    function getStatus(s) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const openFrom = parseDate(s.openFrom);
+      const deadline = parseDate(s.deadline);
+
+      if (openFrom && openFrom > today) {
+        const days = Math.ceil((openFrom - today) / 86400000);
+        return { status: "notyet", label: `Opens in ${days} day${days === 1 ? "" : "s"}`, days };
+      }
+
+      if (!deadline) {
+        return { status: "rolling", label: "Rolling / until funds run out", days: null };
+      }
+
+      const diff = deadline - today;
+      const daysLeft = Math.ceil(diff / 86400000);
+
+      if (daysLeft < 0) return { status: "closed", label: "Deadline passed", days: daysLeft };
+      if (daysLeft === 0) return { status: "today", label: "Due today", days: daysLeft };
+      if (daysLeft <= 7) return { status: "urgent", label: `${daysLeft} day${daysLeft === 1 ? "" : "s"} left`, days: daysLeft };
+      return { status: "open", label: `${daysLeft} day${daysLeft === 1 ? "" : "s"} left`, days: daysLeft };
+    }
+
+    function formatDeadline(d) {
+      if (!d) return "Rolling / varies";
+      const date = parseDate(d);
+      return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    function formatAmount(a) {
+      if (typeof a === "number") return "$" + a.toLocaleString();
+      return "Varies";
+    }
+
+    // ===== FILTER + SORT =====
+    function getFilteredSorted() {
+      const term = state.search.trim().toLowerCase();
+
+      let list = scholarships.filter((s) => {
+        // search term
+        if (term) {
+          const hay = [
+            s.name,
+            s.provider,
+            ...(s.tags || []),
+            s.eligibility,
+            ...(s.requirements || [])
+          ].join(" ").toLowerCase();
+          if (!hay.includes(term)) return false;
+        }
+
+        // type filter
+        if (state.typeFilter !== "all" && !s.types.includes(state.typeFilter)) return false;
+
+        // category pills
+        if (state.categoryFilter !== "all") {
+          if (state.categoryFilter === "uc" && !s.categories.includes("uc")) return false;
+          else if (state.categoryFilter === "community" && !s.categories.includes("community")) return false;
+          else if (["need","merit","stem","military","firstgen"].includes(state.categoryFilter)) {
+            if (!s.categories.includes(state.categoryFilter)) return false;
+          }
+        }
+
+        // open-only toggle
+        if (state.openOnly) {
+          const st = getStatus(s).status;
+          if (!["open", "urgent", "today", "rolling"].includes(st)) return false;
+        }
+
+        // saved-only toggle handled later
+        return true;
+      });
+
+      // saved-only
+      if (state.savedOnly) {
+        list = list.filter(s => state.savedIds.has(s.id));
+      }
+
+      // sort
+      list.sort((a, b) => {
+        if (state.sortBy === "name") {
+          return a.name.localeCompare(b.name);
+        }
+        if (state.sortBy === "amountHigh" || state.sortBy === "amountLow") {
+          const av = typeof a.amount === "number" ? a.amount : -1;
+          const bv = typeof b.amount === "number" ? b.amount : -1;
+          return state.sortBy === "amountHigh" ? bv - av : av - bv;
+        }
+        // default: by deadline (rolling last)
+        const ad = parseDate(a.deadline);
+        const bd = parseDate(b.deadline);
+        if (!ad && !bd) return 0;
+        if (!ad) return 1;
+        if (!bd) return -1;
+        return ad - bd;
+      });
+
+      return list;
+    }
+
+    // ===== RENDER =====
+    function render() {
+      const container = document.getElementById("scholarshipList");
+      const empty = document.getElementById("emptyState");
+      const countEl = document.getElementById("resultCount");
+
+      const list = getFilteredSorted();
+
+      countEl.textContent = `${list.length} scholarship${list.length === 1 ? "" : "s"} shown`;
+
+      if (!list.length) {
+        container.innerHTML = "";
+        empty.style.display = "block";
+        return;
+      }
+
+      empty.style.display = "none";
+
+      const html = list.map((s) => {
+        const st = getStatus(s);
+        const saved = state.savedIds.has(s.id);
+
+        let statusClass = "chip chip-accent";
+        if (st.status === "closed") statusClass = "chip chip-danger";
+        else if (st.status === "rolling") statusClass = "chip chip-rolling";
+        else if (st.status === "urgent" || st.status === "today") statusClass = "chip chip-okay";
+        else if (st.status === "notyet") statusClass = "chip chip-warning";
+
+        let daysClass = "days-left";
+        if (st.status === "closed") daysClass += " closed";
+        else if (st.status === "today") daysClass += " today";
+        else if (st.status === "urgent") daysClass += " urgent";
+        else if (st.status === "notyet") daysClass += " notyet";
+
+        const typeLabels = {
+          federal: "Federal / FAFSA",
+          state: "State program",
+          school: "School-specific",
+          private: "Private / foundation",
+          stem: "STEM",
+          major: "Major-based",
+          military: "Military / VA / ROTC",
+          demographic: "Identity / demographic",
+          need: "Need-based",
+          merit: "Merit-based",
+          service: "Service-for-scholarship"
+        };
+
+        const typeChips = s.types.map(t => {
+          const label = typeLabels[t] || t;
+          return `<span class="chip"><span>🏷️</span><span>${label}</span></span>`;
+        }).join("");
+
+        const categoriesText = (s.tags || []).slice(0, 4).map(t => `<span class="chip">${t}</span>`).join("");
+
+        const requirements = (s.requirements || []).map(r => `<li>${r}</li>`).join("");
+
+        return `
+          <article class="card" data-id="${s.id}">
+            <div class="card-header">
+              <div>
+                <div class="card-title">${s.name}</div>
+                <div class="card-subtitle">${s.provider}</div>
+                <div class="meta-chips">
+                  <span class="chip chip-accent">💰 <span>${formatAmount(s.amount)}</span></span>
+                  <span class="${statusClass}">
+                    <span>${st.status === "closed" ? "⛔" :
+                              st.status === "rolling" ? "♾️" :
+                              st.status === "notyet" ? "⏳" : "⏱️"}</span>
+                    <span>${
+                      st.status === "closed" ? "Closed" :
+                      st.status === "rolling" ? "Rolling" :
+                      st.status === "notyet" ? "Not open yet" : "Open"
+                    }</span>
+                  </span>
+                </div>
+              </div>
+              <button type="button" class="save-btn ${saved ? "saved" : ""}" data-save-id="${s.id}">
+                <span class="star">${saved ? "★" : "☆"}</span>
+                <span>${saved ? "Saved" : "Save"}</span>
+              </button>
+            </div>
+
+            <p class="description">${s.eligibility}</p>
+
+            ${requirements ? `
+              <div class="requirements-list">
+                <strong>To apply, you usually need:</strong>
+                <ul>${requirements}</ul>
+              </div>` : ""}
+
+            <div class="meta-chips" style="margin-top:6px;">
+              ${typeChips}
+              ${categoriesText}
+            </div>
+
+            <footer class="card-footer">
+              <div class="deadline-info">
+                <div>Deadline</div>
+                <div class="deadline-value">${formatDeadline(s.deadline)}</div>
+                <div class="${daysClass}">${st.label}</div>
+              </div>
+              <a class="apply-btn" href="${s.link}" target="_blank" rel="noopener noreferrer">
+                <span>↗</span>
+                <span>Go to application</span>
+              </a>
+            </footer>
+          </article>
+        `;
+      }).join("");
+
+      container.innerHTML = html;
+    }
+
+    // ===== EVENTS =====
+    function setup() {
+      loadSaved();
+      const searchInput = document.getElementById("searchInput");
+      const sortSelect = document.getElementById("sortSelect");
+      const typeSelect = document.getElementById("typeSelect");
+      const openOnlyBtn = document.getElementById("openOnlyBtn");
+      const savedOnlyBtn = document.getElementById("savedOnlyBtn");
+      const categoryPills = document.getElementById("categoryPills");
+      const listEl = document.getElementById("scholarshipList");
+
+      searchInput.addEventListener("input", (e) => {
+        state.search = e.target.value;
+        render();
+      });
+
+      sortSelect.addEventListener("change", (e) => {
+        state.sortBy = e.target.value;
+        render();
+      });
+
+      typeSelect.addEventListener("change", (e) => {
+        state.typeFilter = e.target.value;
+        render();
+      });
+
+      openOnlyBtn.addEventListener("click", () => {
+        state.openOnly = !state.openOnly;
+        openOnlyBtn.classList.toggle("active", state.openOnly);
+        render();
+      });
+
+      savedOnlyBtn.addEventListener("click", () => {
+        state.savedOnly = !state.savedOnly;
+        savedOnlyBtn.classList.toggle("active", state.savedOnly);
+        render();
+      });
+
+      categoryPills.addEventListener("click", (ev) => {
+        const pill = ev.target.closest(".pill");
+        if (!pill) return;
+        const cat = pill.getAttribute("data-category");
+        if (!cat) return;
+        state.categoryFilter = cat;
+        [...categoryPills.querySelectorAll(".pill")].forEach(p =>
+          p.classList.toggle("active", p === pill)
+        );
+        render();
+      });
+
+      listEl.addEventListener("click", (ev) => {
+        const btn = ev.target.closest("[data-save-id]");
+        if (!btn) return;
+        const id = btn.getAttribute("data-save-id");
+        if (state.savedIds.has(id)) state.savedIds.delete(id);
+        else state.savedIds.add(id);
+        saveSaved();
+        render();
+      });
+
+      render();
+    }
+
+    document.addEventListener("DOMContentLoaded", setup);
+  </script>
+</body>
+</html>
